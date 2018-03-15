@@ -1,0 +1,121 @@
+﻿@using System.Collections.Generic
+@using System.Linq
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+@model LoginViewModel
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    ViewData["Title"] = "Log in";
+}
+
+@* Custom Login CSS *@
+<link rel="stylesheet" href="~/css/Login.css" />
+
+<div class="row">
+    <div class="container-fluid container-login">
+        <div class="col-md-2">&nbsp;</div>@* Gap Filler *@
+        <div class="col-md-8">
+            <div class="card-box">
+              <section id="login">
+                 <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                     <h2>@ViewData["Title"]</h2>
+                    <hr />
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div class="form-group">
+                        @* <label asp-for="Email"></label> *@
+                        <input asp-for="Email" class="form-control" placeholder="Email"/>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        @* <label asp-for="Password"></label> *@
+                        <input asp-for="Password" class="form-control" placeholder="Password" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label asp-for="RememberMe">
+                                <input asp-for="RememberMe" />
+                                @Html.DisplayNameFor(m => m.RememberMe)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-block btn-pink btn-lg">Log in</button>
+                    </div>
+
+                     <div class="row text-center">
+                         <div class="col-sm-6">
+                             <p>
+                                 <a asp-action="ForgotPassword">Forgot your password?</a>
+                             </p>
+                         </div>
+                         <div class="col-sm-6">
+                             <p>
+                                 <a asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]">Register as a new user?</a>
+                             </p>
+                         </div>
+                     </div>
+                    </form>
+
+                  @* Login With Social Icons *@
+                  <div class="social-signin-heading">
+                      <h3 class="text-center">Sign In With</h3>
+                  </div></br>
+                  <div class="row">
+                      @*<div class="col-sm-4"><button type="button" class="btn btn-block btn-lg btn-info"><i class="fa fa-twitter"></i> Twitter</button></div>*@
+                          @{
+                              var loginProviders = (await SignInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+                              if (loginProviders.Count == 0)
+                              {
+                                  <div>
+                                      <p>
+                                          There are no external authentication services configured. See <a href="https://go.microsoft.com/fwlink/?LinkID=532715">this article</a>
+                                          for details on setting up this ASP.NET application to support logging in via external services.
+                                      </p>
+                                  </div>
+                              }
+                              else
+                              {
+                                  <form asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
+                                      <div>
+                                          <p>
+                                              @foreach (var provider in loginProviders)
+                                              {
+                                                  @*<button type="submit" class="btn btn-default" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.Name</button>*@
+                                                  @if (provider.Name == "Google")
+                                                  {
+                                                   <div class="col-md-4">
+                                                       <button type="submit" class="btn btn-block btn-lg btn-danger" name="provider" value="@provider.Name" title="Login using your @provider.DisplayName"><i class="fa fa-google-plus"></i> Google+</button>
+                                                   </div>
+                                                  }
+                                                  else if (provider.Name == "Facebook")
+                                                  {
+                                                    <div class="col-md-4">
+                                                        <button type="submit" class="btn btn-block btn-lg btn-primary" name="provider" value="@provider.Name" title="Login using your @provider.DisplayName"><i class="fa fa-facebook"></i> Facebook</button>
+                                                    </div>
+                                                  }
+                                                  else if (provider.Name == "Twitter")
+                                                  {
+                                                    <div class="col-md-4">
+                                                        <button type="submit" class="btn btn-block btn-lg btn-info" name="provider" value="@provider.Name" title="Login using your @provider.DisplayName"><i class="fa fa-twitter"></i> Twitter</button>
+                                                    </div>
+                                                  }
+                                              }
+                                          </p>
+                                      </div>
+                                  </form>
+                              }
+                          }
+                  </div>
+                  @* End login social icons *@
+                </section>@* End Section *@
+           </div>@* End Cardbox *@
+           <div class="col-md-2">&nbsp;</div> @* Gap Filler *@
+        </div>@* End container *@
+    </div>@* End column *@
+</div>@* End row*@
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
